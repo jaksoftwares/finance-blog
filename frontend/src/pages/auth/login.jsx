@@ -13,31 +13,45 @@ export default function Login() {
     return <p className="text-center text-red-500">Error: AuthContext is not available</p>;
   }
 
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault(); // ✅ Prevents page refresh
+
+    setError(""); // Clear previous errors
 
     const cleanedData = {
-        username: formData.username.trim(),  // Trim spaces
-        password: formData.password.trim()
+        username: formData.username.trim(),
+        password: formData.password.trim(),
     };
 
     try {
-        const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", cleanedData, {
-            headers: { "Content-Type": "application/json" },
-        });
+        console.log("Submitting login request:", cleanedData);
+
+        const response = await axios.post(
+            "http://127.0.0.1:8000/api/auth/login/",
+            cleanedData,
+            { headers: { "Content-Type": "application/json" } }
+        );
 
         console.log("Login Response:", response.data);
 
         if (response.data.access) {
             localStorage.setItem("access_token", response.data.access);
             localStorage.setItem("refresh_token", response.data.refresh);
-            navigate("/dashboard");
+
+            // ✅ Update authentication state
+            authContext.setUser({ username: formData.username });
+
+            console.log("🚀 Tokens saved. Redirecting...");
+
+            // ✅ Delay navigation slightly to let state update
+            setTimeout(() => {
+                navigate("/dashboard");
+                console.log("✅ Navigation to /dashboard triggered");
+            }, 200);
         } else {
             setError("Login failed: No token received.");
         }
@@ -50,7 +64,8 @@ export default function Login() {
             setError("Something went wrong. Check console.");
         }
     }
-};
+  };
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100">
       <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
@@ -58,7 +73,7 @@ export default function Login() {
 
         {error && <p className="text-center text-red-500">{error}</p>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
             <input

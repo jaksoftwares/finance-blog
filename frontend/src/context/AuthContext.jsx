@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("refresh", refresh);
       setToken(access);
 
-      // Decode user from token (optional: if backend provides user data, use that)
+      // Set user state (Modify this if your API returns user details)
       setUser({ username: formData.username });
 
       return { success: true };
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
