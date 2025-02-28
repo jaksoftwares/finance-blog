@@ -2,19 +2,17 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "./context/AuthProvider.jsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"; // ✅ Import React Query
+import { AuthProvider } from "./context/AuthContext.js"; 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 
-
-// ✅ Create a QueryClient instance
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>  {/* ✅ Wrap app in QueryClientProvider */}
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
+        <AuthProvider>  {/* ✅ Use AuthProvider from AuthContext.js */}
           <App />
         </AuthProvider>
       </BrowserRouter>

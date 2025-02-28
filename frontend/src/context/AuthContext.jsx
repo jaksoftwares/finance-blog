@@ -1,39 +1,60 @@
 import { createContext, useState, useEffect } from "react";
-import PropTypes from "prop-types";
+import PropTypes from "prop-types"; // ✅ Import PropTypes
+import axios from "axios";
 
-const AuthContext = createContext(null);
+// Create the Auth Context
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+  // Function to log in a user
+  const login = async (formData) => {
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", formData);
+      const { access, refresh } = response.data;
+
+      // Store token & user data
+      localStorage.setItem("token", access);
+      localStorage.setItem("refresh", refresh);
+      setToken(access);
+
+      // Decode user from token (optional: if backend provides user data, use that)
+      setUser({ username: formData.username });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Login failed:", error.response?.data);
+      return { success: false, message: error.response?.data?.detail || "Invalid credentials" };
     }
-    setLoading(false);
-  }, []);
-
-  const login = (userData) => {
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
   };
 
+  // Function to log out a user
   const logout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh");
+    setToken(null);
     setUser(null);
   };
 
+  // Check token validity on page load
+  useEffect(() => {
+    if (token) {
+      setUser({ username: "Authenticated User" }); // Optional: Fetch user details from API
+    }
+  }, [token]);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// ✅ Define Prop Types for `AuthProvider`
 AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired, // `children` must be a React node and is required
 };
 
-export default AuthContext; // ✅ Make sure it's a default export
+export default AuthContext;

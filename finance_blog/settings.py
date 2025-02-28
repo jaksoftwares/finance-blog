@@ -18,6 +18,7 @@ ALLOWED_HOSTS = []
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Replace with your frontend URL
+    'http://localhost:3000',
 ]
 
 
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    "rest_framework.authtoken",
     'ckeditor',
     'blog',
     'corsheaders',
@@ -127,6 +129,7 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        "rest_framework.authentication.TokenAuthentication",
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -134,5 +137,5 @@ REST_FRAMEWORK = {
 }
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "frontend", "dist"),
+    os.path.join(BASE_DIR, "frontend"),
 ]

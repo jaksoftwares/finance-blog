@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import React from "react";
+import "react";
 
 const fetchPost = async (id) => {
   const { data } = await axios.get(`http://127.0.0.1:8000/api/posts/${id}/`);

@@ -1,15 +1,15 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import PostDetail from "./pages/post/postdetail";
-// import LoginPage from "./pages/LoginPage";
-// import RegisterPage from "./pages/RegisterPage";
-// import Dashboard from "./pages/Dashboard";
-// import CreatePost from "./pages/CreatePost";
 import Blogs from "./pages/blog/blogs";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Login from "./pages/auth/login";
 import Register from "./pages/auth/Register";
-import Footer from "./components/Footer";
+import PrivateRoute from "./components/PrivateRoute"; // ✅ Import Protected Route
+import AuthRedirect from "./components/AuthRedirect"; // ✅ Import AuthRedirect
+
+// Dashboard Components
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import Posts from "./pages/dashboard/Posts";
@@ -19,25 +19,41 @@ import Analytics from "./pages/dashboard/Analytics";
 import Settings from "./pages/dashboard/Settings";
 
 function App() {
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith("/dashboard"); // Check if user is in Dashboard
+
   return (
     <>
-      <Navbar />
+      {/* Only show Navbar & Footer if NOT on Dashboard */}
+      {!isDashboard && <Navbar />}
+
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/post/:id" element={<PostDetail />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
         <Route path="/blog" element={<Blogs />} />
-        <Route path="/dashboard" element={<DashboardLayout />} />
-        <Route path="/dposts" element={<Posts />} />
-        <Route path="/dhome" element={<DashboardHome />} />
-        <Route path="/dcategories" element={<Categories/>} />
-        <Route path="/dusers" element={<Users />} />
-        <Route path="/danalytics" element={<Analytics />} />
-        <Route path="/dsettings" element={<Settings />} />
-        {/* <Route path="/create" element={<CreatePost />} /> */}
+
+        {/* Redirect Logged-In Users from Login/Register */}
+        <Route path="/login" element={<AuthRedirect Component={Login} />} />
+        <Route path="/register" element={<AuthRedirect Component={Register} />} />
+
+        {/* Protected Dashboard Routes */}
+        <Route path="/dashboard" element={<PrivateRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route index element={<DashboardHome />} />
+            <Route path="posts" element={<Posts />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="users" element={<Users />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Route>
+
+        {/* Catch-All Route for 404 */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      <Footer/>
+
+      {!isDashboard && <Footer />} {/* Hide Footer on Dashboard */}
     </>
   );
 }

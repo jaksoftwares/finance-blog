@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BlogPostListCreate, BlogPostDetail, CommentListCreate, LikeCreate, RegisterView
+from .views import BlogPostListCreate, BlogPostDetail, CommentListCreate, DashboardStats, LikeCreate, RegisterView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -10,4 +10,5 @@ urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/login/', TokenObtainPairView.as_view(), name='login'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('dashboard/stats/', DashboardStats.as_view(), name='dashboard-stats'), 
 ]
